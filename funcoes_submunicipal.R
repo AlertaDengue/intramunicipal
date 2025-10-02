@@ -22,7 +22,6 @@ ler_dados_dengue <- function(caminho) {
 completar_dados_bairros <- function(dados_bairros, bairros_unicos, se_var, nm_bairr_var, 
                                     group_var = "arbo", max_semana_epidemiologica = NULL) {
   
-  # Load required libraries
   library(dplyr)
   library(tidyr)
   

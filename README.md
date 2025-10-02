@@ -1,1 +1,1 @@
-the data used (SE 36) is on the dropbox
+The objective of this repo is to aggregate cases on an intramunicipal scale and produce infodengue products for this scale. 

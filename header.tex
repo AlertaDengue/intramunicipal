@@ -1,0 +1,22 @@
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+
+% Ajustes críticos de layout
+\setlength{\headheight}{36pt}
+\addtolength{\topmargin}{-20pt}
+
+% Configuração do cabeçalho para TODAS as páginas
+\pagestyle{fancy}
+\fancyhf{} % Limpa configurações padrão
+\fancyhead[L]{\includegraphics[height=25pt]{logo1.png}}
+\fancyhead[R]{\includegraphics[height=25pt]{logo2.png}}
+\renewcommand{\headrulewidth}{0pt} % Remove a linha
+
+% Força o mesmo estilo na primeira página
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[L]{\includegraphics[height=25pt]{logo1.png}}
+  \fancyhead[R]{\includegraphics[height=25pt]{logo2.png}}
+  \renewcommand{\headrulewidth}{0pt}
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<script src="lib/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lib/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="lib/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="lib/kePrint-0.0.1/kePrint.js"></script>
+<link href="lib/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+</head>
+<body>
+<table class="table" style="font-size: 9px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">Plano de Contingência Nacional para Controle da Dengue</caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;"> Cor </th>
+   <th style="text-align:left;"> Nível de Atenção </th>
+   <th style="text-align:left;"> Situação </th>
+   <th style="text-align:left;"> Nível de contingência </th>
+   <th style="text-align:left;"> Situação </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;width: 1.5cm; font-weight: bold;background-color: green !important;"> verde </td>
+   <td style="text-align:left;width: 3.5cm; "> Condições não favoráveis para transmissão / baixo risco </td>
+   <td style="text-align:left;width: 4cm; "> Atividade viral baixa / temperatura ou umidade relativa baixa/ Poucos rumores no Twitter </td>
+   <td style="text-align:left;width: 2.5cm; "> Nenhuma ação de contingência necessária </td>
+   <td style="text-align:left;width: 4cm; "> - </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;width: 1.5cm; font-weight: bold;background-color: yellow !important;"> amarelo </td>
+   <td style="text-align:left;width: 3.5cm; "> Atenção: Condições favoráveis com presença de circulação viral </td>
+   <td style="text-align:left;width: 4cm; "> Atividade viral presente (pelo menos 1 caso) / Temperatura ou umidade relativa favoráveis ao vetor/ Presença de rumores no Twitter </td>
+   <td style="text-align:left;width: 2.5cm; "> Pré-contingência </td>
+   <td style="text-align:left;width: 4cm; "> Condição climática favorece atividade do vetor </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;width: 1.5cm; font-weight: bold;background-color: orange !important;"> laranja </td>
+   <td style="text-align:left;width: 3.5cm; "> Transmissão sustentada </td>
+   <td style="text-align:left;width: 4cm; "> Incidência crescente porém dentro dos níveis históricos </td>
+   <td style="text-align:left;width: 2.5cm; "> Nível 0 </td>
+   <td style="text-align:left;width: 4cm; "> Incidência em ascensão por três semanas seguidas + introdução/reintrodução de novo sorotipo ou IP ultrapassar o limite de 1% ou aumento de rumores no Twitter na última semana. </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;width: 1.5cm; font-weight: bold;background-color: orange !important;"> laranja </td>
+   <td style="text-align:left;width: 3.5cm; "> Transmissão sustentada </td>
+   <td style="text-align:left;width: 4cm; "> Incidência crescente porém dentro dos níveis históricos </td>
+   <td style="text-align:left;width: 2.5cm; "> Nível 1 </td>
+   <td style="text-align:left;width: 4cm; "> Incidência permanecer em ascensão por quatro semanas consecutivas e/ou ocorra notificação de caso grave suspeito ou suspeita de óbito por dengue. </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;width: 1.5cm; font-weight: bold;background-color: red !important;"> vermelho </td>
+   <td style="text-align:left;width: 3.5cm; "> Incidência alta </td>
+   <td style="text-align:left;width: 4cm; "> Incidência alta para os padrões históricos (acima de 90%) </td>
+   <td style="text-align:left;width: 2.5cm; "> Nível 2 </td>
+   <td style="text-align:left;width: 4cm; "> Número de casos notificados para o ano ultrapassar os do limite máximo com transmissão sustentada de acordo com o diagrama de controle e/ou ocorra um aglomerado de óbitos suspeitos por dengue. </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;width: 1.5cm; font-weight: bold;background-color: red !important;"> vermelho </td>
+   <td style="text-align:left;width: 3.5cm; "> Incidência alta </td>
+   <td style="text-align:left;width: 4cm; "> Incidência alta para os padrões históricos (acima de 90%) </td>
+   <td style="text-align:left;width: 2.5cm; "> Nível 3 </td>
+   <td style="text-align:left;width: 4cm; "> Número de casos notificados para o ano ultrapassar os do limite máximo com transmissão sustentada de acordo com o diagrama de controle e de mortalidade por dengue nas últimas quatro semanas for maior ou igual a 0,06/100 mil habitantes. </td>
+  </tr>
+</tbody>
+</table> <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [["$","$"]]}})</script><script async src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

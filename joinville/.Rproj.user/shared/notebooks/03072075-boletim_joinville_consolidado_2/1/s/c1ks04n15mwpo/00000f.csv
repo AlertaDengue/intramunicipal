@@ -1,0 +1,6 @@
+"0","casos_acumulado_atual <- dados_api %>% "
+"0","  filter(substr(SE, 1, 4) == ano_atual) %>% "
+"0","  pull(casos) %>% "
+"0","  sum()"
+"0",""
+"0","inc_acumulado <- round(casos_acumulado_atual/616317*1e5, 1)"

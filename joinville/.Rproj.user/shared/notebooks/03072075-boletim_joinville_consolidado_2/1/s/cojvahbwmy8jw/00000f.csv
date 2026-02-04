@@ -1,0 +1,6 @@
+"0","ggarrange("
+"0","  comp_mun_anos_dengon,"
+"0","  comp_mun_anos_chikon,"
+"0","  ncol = 1, "
+"0","  labels = letters[1:2]"
+"0",")"

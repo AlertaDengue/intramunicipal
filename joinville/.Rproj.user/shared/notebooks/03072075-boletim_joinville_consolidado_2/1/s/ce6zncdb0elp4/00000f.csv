@@ -1,0 +1,8 @@
+"2","r error 4 (Error in eval(ele) : object 'week_atual' not found
+)"
+"0","ggarrange("
+"0","  jv_inc_distritos_dengon[[1]] + ylim(0, 500),"
+"0","  jv_inc_distritos_dengon[[2]] + ylim(0, 500),"
+"0","  jv_inc_distritos_dengon[[3]] + ylim(0, 500),"
+"0","  ncol = 1"
+"0",")"

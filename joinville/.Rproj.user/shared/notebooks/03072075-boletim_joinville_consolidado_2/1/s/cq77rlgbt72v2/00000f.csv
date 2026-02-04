@@ -1,0 +1,8 @@
+"2","r error 4 (Error in eval(ele) : object 'week_atual' not found
+)"
+"0","ggarrange("
+"0","  rt_mun_dengon$combined_plot,"
+"0","  rt_mun_chikon$combined_plot,"
+"0","  ncol = 1, "
+"0","  labels = letters[1:2]"
+"0",")"

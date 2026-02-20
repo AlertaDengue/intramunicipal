@@ -12,8 +12,8 @@ format:
         \addtolength{\topmargin}{-20pt}
         \pagestyle{fancy}
         \fancyhf{}
-        \fancyhead[L]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}}
-        \fancyhead[R]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}}
+        \fancyhead[L]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}} #ajustar!!
+        \fancyhead[R]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}} #ajustar!!
         \renewcommand{\headrulewidth}{0pt}
         \fancypagestyle{plain}{
           \fancyhf{}

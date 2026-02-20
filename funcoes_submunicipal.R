@@ -1,5 +1,28 @@
 ## Funções extras boletim submunicipal
 
+# Função para criar break do eixo X dos plots de janela de 1 ano
+criar_breaks_1ano <- function(ano_fim, semana_fim, passo = 10) {
+  abs_fim    <- ano_fim * 52 + semana_fim
+  abs_inicio <- abs_fim - 52  # começa na mesma semana do ano anterior
+  
+  abs_breaks <- seq(abs_inicio, abs_fim, by = passo)
+  
+  if (tail(abs_breaks, 1) != abs_fim) {
+    abs_breaks <- c(abs_breaks, abs_fim)
+  }
+  
+  anos    <- abs_breaks %/% 52
+  semanas <- abs_breaks %% 52
+  
+  mask <- semanas == 0
+  semanas[mask] <- 52
+  anos[mask]    <- anos[mask] - 1
+  
+  breaks <- anos * 100 + semanas
+  return(breaks)
+}
+
+
 # Função para normalizar nomes de bairros
 normalizar_bairro <- function(nome) {
   nome %>%
@@ -460,7 +483,7 @@ create_receptivity_plot <- function(api_data, weeks_limit) {
     geom_hline(aes(yintercept = 18, color = "Limiar Favorável (18°C)"), 
                linewidth = 1, linetype = "dashed") +
     scale_color_manual(values = c("red")) +
-    scale_x_discrete(breaks = levels(factor(api_data$SE))[seq(1, nlevels(factor(api_data$SE)), by = 8)]) +
+    scale_x_discrete(breaks = breaks_1ano) +
     scale_y_continuous(
       name = "Temperatura Mínima (°C)") +
     labs(x = "Semanas Epidemiológicas", 
@@ -511,7 +534,7 @@ create_rt_plot <- function(api_data, weeks_limit, title_suffix, facet_by = NULL,
       ggplot() +
       geom_line(aes(x = factor(!!sym(sem_not)), y = Rt, group = 1), linetype = 1) +
       geom_hline(yintercept = 1, linetype = 2, col = "red") +
-      scale_x_discrete(breaks = levels(factor(as.character(api_data[[sem_not]])))[seq(1, nlevels(factor(as.character(api_data[[sem_not]]))), by = 8)]) +
+      scale_x_discrete(breaks = breaks_1ano) +
       labs(x = "Semanas Epidemiológicas", y = "Rt", title = title_suffix) +
       theme_minimal(base_size = 12) +
       theme(legend.position = "top", axis.text.x = element_text(angle = 45, hjust = 1))

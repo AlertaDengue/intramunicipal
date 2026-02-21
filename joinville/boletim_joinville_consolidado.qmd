@@ -775,7 +775,7 @@ if (any(dados_api$arbo == "chikon", na.rm = TRUE)) {
   rt_distrito_nome_chikon <- NULL
 }
 
-# Incidencia por rpa_nome - Dengue
+# Incidencia por distrito - Dengue
 rf_inc_distrito_nomes_dengon <- map(names(rf_distrito_nomes_nowcast), ~ {
   distrito_nome <- .x
   create_incidence_plot(

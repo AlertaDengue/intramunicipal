@@ -12,8 +12,8 @@ format:
         \addtolength{\topmargin}{-20pt}
         \pagestyle{fancy}
         \fancyhf{}
-        \fancyhead[L]{\includegraphics[height=40pt]{~/Documentos/intramunicipal/logo1.png}}
-        \fancyhead[R]{\includegraphics[height=40pt]{~/Documentos/intramunicipal/logo2.png}}
+        \fancyhead[L]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}}
+        \fancyhead[R]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}}
         \renewcommand{\headrulewidth}{0pt}
         \fancypagestyle{plain}{
           \fancyhf{}
@@ -23,7 +23,7 @@ format:
         }
     keep-tex: false
 editor: visual
-output-file: "rec_boletim_SE49"
+output-file: "rec_boletim_SE05"
 output-ext: "pdf"
 ---
 
@@ -51,7 +51,7 @@ pacman::p_load(
 )
 
 # Carregar funções customizadas
-source("~/Documentos/intramunicipal/funcoes_submunicipal.R")
+source("~/Documents/intramunicipal/funcoes_submunicipal.R")
 
 # Definir ano e semana atual
 # ano_atual <- year(Sys.Date()) - 1
@@ -60,7 +60,7 @@ source("~/Documentos/intramunicipal/funcoes_submunicipal.R")
 
 ```{r carregar_dados, include=FALSE, cache=FALSE}
 # Carregar dados de referência
-load("~/Documentos/intramunicipal/recife/ref_RF.RData")
+load("~/Documents/intramunicipal/recife/ref_RF.RData")
 
  params$limiar_preseason <- 6.17
  params$limiar_epidemico <- 26.91
@@ -73,11 +73,11 @@ limiar_epidemico <- params$limiar_epidemico
 limiar_posseason <- params$limiar_posseason
 
 # Dados históricos de alerta (API InfoDengue)
-dados_api_dengue <- read.csv("~/Documentos/dados_teste_intramunicipal/se05/dengue_52-5.csv") %>% 
+dados_api_dengue <- read.csv("~/Documents/dados_teste_intramunicipal/se05/dengue_52-5.csv") %>% 
   mutate(arbo = "dengue") %>% 
   arrange(SE)
 
-dados_api_chikon <- read.csv("~/Documentos/dados_teste_intramunicipal/se05/chikungunya_52-5.csv") %>% 
+dados_api_chikon <- read.csv("~/Documents/dados_teste_intramunicipal/se05/chikungunya_52-5.csv") %>% 
   mutate(arbo = "chikon") %>% 
   arrange(SE)
 
@@ -85,7 +85,7 @@ dados_api <- rbind(dados_api_dengue, dados_api_chikon) #%>%
  # filter(SE > 202301)
 
 # Dados de notificacoes
-df_mun <- read_parquet("~/Documentos/dados_teste_intramunicipal/se05/dengue.parquet") %>% 
+df_mun <- read_parquet("~/Documents/dados_teste_intramunicipal/se05/dengue.parquet") %>% 
   filter(municipio_geocodigo == 2611606) %>% 
   mutate(
     sem_not = paste0(ano_notif, sprintf("%02d", se_notif)),
@@ -98,8 +98,7 @@ df_mun <- read_parquet("~/Documentos/dados_teste_intramunicipal/se05/dengue.parq
     dt_sin_pri = as.Date(dt_sin_pri, format = "%Y-%m-%d"),
     dt_notific = as.Date(dt_notific, format = "%Y-%m-%d")
   ) %>% 
-  arrange(sem_not) %>% 
-  filter(sem_not <= 202549) 
+  arrange(sem_not) 
 
 # Atualizar weeks_2_plot baseado nos dados
 # weeks_2_plot_full <- tail(sort(unique(factor(df_mun$sem_not))), 3)
@@ -113,7 +112,7 @@ ano_week <- as.numeric(paste0(ano_atual, sprintf("%02d", week_atual)))
 breaks_1ano <- criar_breaks_1ano(ano_fim = ano_atual,
                                                 semana_fim = week_atual)
 
-breaks_anual <- sprintf("%02d", seq(1,52, by = 1))
+breaks_anual <- sprintf("%02d", seq(1,52, by = 4))
 
 # Dados de temperatura downscaling por rpa_nome
 # rpa_nome_downsc <- read.csv("./downscaling infodengue/output/medias_por_rpa_nome.csv") %>% 
@@ -441,7 +440,7 @@ bairros_ultima_semana_dengue <- bairros_ultima_semana_dengue %>%
 # Top 10 bairros para chikungunya
 bairros_ultima_semana_chikon <- df_bairros %>%
   filter(arbo == "chikon") %>% 
-  filter(sem_not == weeks_2_plot_full[3]) %>% 
+  filter(sem_not == weeks_2_plot[3]) %>% 
   slice_head(n = 10) %>% 
   select(nm_bairro_ref, rpa_nome, casos, inc, Rt, nivel) %>% 
   mutate(Rt = ifelse(is.na(Rt), 0, Rt))
@@ -613,7 +612,7 @@ fig4 <- ggarrange(fig4A, fig4B, ncol = 1, labels = letters[1:2])
 # Gráfico de incidência municipal - Dengue
 rf_inc_mun_dengon <- create_incidence_plot( 
   nowcast_data = rf_mun_nowscat$mun_nowcast, 
-  observed_data = rf_mun_nowscat$mun_observados, 
+  observed_data = rf_mun_nowscat$mun_observados %>% filter(ano_epi <= ano_week), 
   title_suffix = paste0("Curva de incidência de dengue - Recife até SE", week_atual),
   include_zoom = FALSE, 
   convert_to_incidence = TRUE, 
@@ -627,7 +626,7 @@ if (any(dados_api$arbo == "chikon", na.rm = TRUE)) {
   # max_val <- max(dados_api %>% filter(arbo == "chikon") %>% pull(p_inc100k))
   
   rf_inc_mun_chikon <- dados_api %>%
-  filter(arbo == "chikon" & SE >= paste0(ano_atual-1, week_atual)) %>%
+  filter(arbo == "chikon" & SE >= ano_week - 100) %>%
   mutate(nivel = factor(nivel)) %>% 
   ggplot() +
   geom_ribbon(
@@ -662,7 +661,7 @@ rf_receptividade_climatica <- create_receptivity_plot(
   api_data = dados_api %>% 
     mutate(ano = as.numeric(substr(SE, 1, 4))) %>% 
     filter(arbo == "dengue" & ano %in% c(ano_atual-1, ano_atual)),
-  weeks_limit = weeks_2_plot_full[3]
+  weeks_limit = weeks_2_plot[3]
 )
 
 # Comparação histórica - Dengue
@@ -729,7 +728,7 @@ if (any(dados_api$arbo == "chikon", na.rm = TRUE)) {
   rename(sem_not = SE) %>%
   select(sem_not, casos) %>% 
     AlertTools::Rt(gtdist = "normal",meangt = 3,sdgt = 1) %>% 
-  filter(sem_not >= paste0(ano_atual-1, week_atual)) 
+  filter(sem_not >= ano_week - 100) 
 
 
 rt_mun_dengon <-create_rt_plot(
@@ -746,7 +745,7 @@ if (any(dados_api$arbo == "chikon", na.rm = TRUE)) {
   rename(sem_not = SE) %>%
   select(sem_not, casos) %>% 
     AlertTools::Rt(gtdist = "normal",meangt = 3,sdgt = 1) %>% 
-  filter(sem_not >= paste0(ano_atual-1, week_atual)) 
+  filter(sem_not >= ano_week - 100) 
   
  rt_mun_chikon <-  create_rt_plot(
   api_data = dados_rt_mun_chikon %>% 
@@ -764,7 +763,7 @@ if (any(dados_api$arbo == "chikon", na.rm = TRUE)) {
 rt_rpa_nome_dengon <- create_rt_plot(
   api_data = df_rpas %>% 
     filter(arbo == "dengue", sem_not >= ano_week - 100), 
-  weeks_limit = weeks_2_plot_full[3], 
+  weeks_limit = weeks_2_plot[3], 
   facet_by = "rpa_nome",
   title_suffix = "",
   lwr = "lwr", upr = "upr"
@@ -831,7 +830,7 @@ if (any(df_rpas$arbo == "chikon", na.rm = TRUE)) {
                      "3" = "Transmissão", "4" = "Alta atividade"),
           breaks = c("1", "2", "3", "4")
         ) +
-        scale_x_discrete(brekas = breaks_1ano) +
+        scale_x_discrete(breaks = breaks_1ano) +
         scale_y_continuous(limits = c(min_val, max_val+5)) +
         theme_minimal() +
         theme(legend.position = "top", axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -846,14 +845,14 @@ if (any(df_rpas$arbo == "chikon", na.rm = TRUE)) {
 if(F){
 # Top 3 bairros - Dengue
 top_3_bairros_dengon <- df_bairros %>% 
-  filter(sem_not == weeks_2_plot_full[3] & arbo == "dengue") %>% 
+  filter(sem_not == weeks_2_plot[3] & arbo == "dengue") %>% 
   arrange(desc(inc)) %>%
   slice_head(n = 3) %>%
   pull(nm_bairro_ref)
 
 min_val_bairro <- min(df_bairros %>%
                         filter(arbo == "dengue" & 
-                                 sem_not >= paste0(ano_atual-1, week_atual)) %>% 
+                                 sem_not >= ano_week - 100) %>% 
                         pull(inc), na.rm = TRUE)
 
 max_val_bairro <- max(df_bairros %>%
@@ -922,7 +921,7 @@ rf_map_bairros_dengon <- create_map_panel(
     data = df_bairros,
     value_col = "inc", 
     arbo = "dengue",
-    weeks_2_plot = as.numeric(as.character(weeks_2_plot_full)),
+    weeks_2_plot = as.numeric(as.character(weeks_2_plot)),
     shape = df_rpas, 
     area = "rpa_nome"
   )
@@ -1200,7 +1199,7 @@ casos_acumulados_rpa_nome_dengon <- df_rpas %>%
   arrange(sem_not, rpa_nome) %>%  
   group_by(rpa_nome) %>%
   mutate(acumulado = cumsum(casos)) %>% 
-  filter(sem_not %in% weeks_2_plot_full) %>% 
+  filter(sem_not %in% weeks_2_plot) %>% 
   arrange(rpa_nome, desc(sem_not))
 
 tab3_dados <- df_rpas %>% 
@@ -1251,7 +1250,7 @@ casos_acumulados_rpa_nome_chikon <- df_rpas %>%
   arrange(sem_not, rpa_nome) %>%  
   group_by(rpa_nome) %>%
   mutate(acumulado = cumsum(casos)) %>% 
-  filter(sem_not %in% weeks_2_plot_full) %>% 
+  filter(sem_not %in% weeks_2_plot) %>% 
   arrange(rpa_nome, desc(sem_not))
 
 
@@ -1540,7 +1539,7 @@ ggarrange(
 
 O perfil sazonal da receptividade climática no município para a transmissão das arboviroses é calculado a partir dos dados meteorológicos e indicam períodos do ano em que há maior risco de transmissão de arboviroses. A figura 6 apresenta uma escala de receptividade que varia de 0 (período pouco receptivo) a 100 (período muito receptivo) sendo que, períodos muito receptivos, marcam a sazonalidade da doença. Observa-se que o período receptivo típico no município ocorre entre as semanas 45 e 15, que corresponde ao período com temperaturas mínimas acima de 18 graus.
 
-```{r fig6, fig.cap=paste0("Receptividade climática e temperatura mínima do município até SE", week_atual, ". A linha amarela corresponde à variação da temperatura mínima durante o período. A área azul corresponde a período com receptividade climática favorável à transmissão de arboviroses, enquanto a área cinza a receptividade abaixo do limiar favorável."), fig.width=5, fig.height=4}
+```{r fig6, fig.cap=paste0("Receptividade climática e temperatura mínima do município até SE", week_atual, ". A linha amarela corresponde à variação da temperatura mínima durante o período. A área azul corresponde a período com receptividade climática favorável à transmissão de arboviroses, enquanto a área cinza a receptividade abaixo do limiar favorável."), fig.width=7, fig.height=4}
 rf_receptividade_climatica
 ```
 
@@ -1548,7 +1547,7 @@ rf_receptividade_climatica
 
 O perfil sazonal das séries temporais de incidência de casos de dengue e chikungunya nos últimos 10 e 5 anos, respectivamente, estão representadas na figura 7 e podem ser comparadas com a incidência desse ano (marcado em vermelho).
 
-```{r fig7, fig.cap="Comparação da incidência do ano atual com do ano passado para Dengue (A) e Chikungunya (B).", fig.height=7, fig.width=5, out.width= "70%"}
+```{r fig7, fig.cap="Comparação da incidência do ano atual com do ano passado para Dengue (A) e Chikungunya (B).", fig.height=8, fig.width=7, out.width= "70%"}
 ggarrange(
   comp_mun_anos_dengon,
   comp_mun_anos_chikon,
@@ -1556,6 +1555,8 @@ ggarrange(
   labels = letters[1:2]
 )
 ```
+
+\vspace{3cm}
 
 ## Número reprodutivo
 

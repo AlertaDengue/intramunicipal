@@ -376,11 +376,7 @@ create_incidence_plot <- function(nowcast_data, observed_data, title_suffix = NU
       legend.position = "top",
       axis.text.x = element_text(angle = 45, hjust = 1)
     ) +
-    scale_x_discrete(
-      breaks = levels(factor(observed_data$ano_epi))[
-        seq(1, nlevels(factor(observed_data$ano_epi)), by = 8)
-      ]
-    ) +
+    scale_x_discrete(breaks = breaks_1ano) +
     # scale_y_continuous(
     #   limits= c(min_val,max_val)
     # ) +
@@ -450,11 +446,7 @@ create_incidence_plot <- function(nowcast_data, observed_data, title_suffix = NU
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank()
     ) +
-    scale_x_discrete(
-      breaks = levels(factor(zoom_data$ano_epi))[
-        seq(1, nlevels(factor(zoom_data$ano_epi)), by = 1)
-      ]
-    ) 
+    scale_x_discrete(breaks = breaks_1ano) 
   
   # Combinar os gráficos usando patchwork
   final_plot <- p_main + 
@@ -562,7 +554,7 @@ create_rt_plot <- function(api_data, weeks_limit, title_suffix, facet_by = NULL,
       ggplot() +
       geom_line(aes(x = factor(!!sym(sem_not)), y = Rt, group = 1), linetype = 1) +
       geom_hline(yintercept = 1, linetype = 2, col = "red") +
-      scale_x_discrete(breaks = levels(factor(as.character(api_data[[sem_not]])))[seq(1, nlevels(factor(as.character(api_data[[sem_not]]))), by = 8)]) +
+      scale_x_discrete(breaks = breaks_1ano) +
       labs(x = "Semanas Epidemiológicas", y = "Rt", title = title_suffix) +
       theme_minimal(base_size = 15) +
       theme(legend.position = "top", axis.text.x = element_text(angle = 45, hjust = 1))
@@ -596,7 +588,7 @@ create_rt_plot <- function(api_data, weeks_limit, title_suffix, facet_by = NULL,
         ggplot() +
         geom_line(aes(x = factor(!!sym(sem_not)), y = Rt, group = 1), linetype = 1) +
         geom_hline(yintercept = 1, linetype = 2, col = "red") +
-        scale_x_discrete(breaks = levels(factor(as.character(api_data[[sem_not]])))[seq(1, nlevels(factor(as.character(api_data[[sem_not]]))), by = 8)]) +
+        scale_x_discrete(breaks = breaks_1ano) +
         labs(x = "Semanas Epidemiológicas", y = "Rt", 
              title = paste(title_suffix, "", level)) +
         theme_minimal(base_size = 12) +

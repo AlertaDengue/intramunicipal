@@ -1,30 +1,64 @@
 ---
 title: ""
-format: 
+format:
   pdf:
     fig-width: 4
     include-in-header:
-      text: |
-        \usepackage{fancyhdr}
-        \usepackage{graphicx}
-        \usepackage[export]{adjustbox}
-        \setlength{\headheight}{36pt}
-        \addtolength{\topmargin}{-20pt}
-        \pagestyle{fancy}
-        \fancyhf{}
-        \fancyhead[L]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}}
-        \fancyhead[R]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}}
-        \renewcommand{\headrulewidth}{0pt}
-        \fancypagestyle{plain}{
+      - text: |
+          \usepackage{fancyhdr}
+          \usepackage{graphicx}
+          \usepackage[export]{adjustbox}
+          \usepackage{xcolor}
+          \usepackage{hyperref}
+          \definecolor{infodengue}{RGB}{0, 83, 156}
+          \setlength{\headheight}{70pt}
+          \addtolength{\topmargin}{-40pt}
+          \input{cabecalho_municipio.tex}
+          \pagestyle{fancy}
           \fancyhf{}
-          \fancyhead[L]{\includegraphics[height=25pt]{logo1.png}}
-          \fancyhead[R]{\includegraphics[height=25pt]{logo2.png}}
+          \fancyhead[L]{%
+            \begin{minipage}{\textwidth}
+              \includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}%
+              \hfill%
+              \includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}\\[-6pt]
+              \color{infodengue}\rule{\textwidth}{2pt}\\[2pt]
+              \color{black}\small\textbf{Boletim Semanal - semana \theweek\ de \theyear}\\[1pt]
+            \end{minipage}
+          }
           \renewcommand{\headrulewidth}{0pt}
-        }
+          \fancyfoot[L]{%
+            \begin{minipage}{\textwidth}
+              \color{infodengue}\rule{\textwidth}{1pt}\\[2pt]
+              \color{black}\small%
+              \href{https://info.dengue.mat.br/}{InfoDengue}%
+              \hfill Boletim Municipal - Recife \hfill SE \theweek\ de \theyear
+            \end{minipage}
+          }
+          \renewcommand{\footrulewidth}{0pt}
+          \fancypagestyle{plain}{
+            \fancyhf{}
+            \fancyhead[L]{%
+              \begin{minipage}{\textwidth}
+                \includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}%
+                \hfill%
+                \includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}\\[-6pt]
+                \color{infodengue}\rule{\textwidth}{2pt}\\[2pt]
+                \color{black}\small\textbf{Boletim Semanal - semana \theweek\ de \theyear}\\[1pt]
+              \end{minipage}
+            }
+            \renewcommand{\headrulewidth}{0pt}
+            \fancyfoot[L]{%
+              \begin{minipage}{\textwidth}
+                \color{infodengue}\rule{\textwidth}{1pt}\\[2pt]
+                \color{black}\small%
+                \href{https://info.dengue.mat.br/}{InfoDengue}%
+                \hfill Boletim Municipal - \themunicipio \hfill SE \theweek\ de \theyear
+              \end{minipage}
+            }
+            \renewcommand{\footrulewidth}{0pt}
+          }
     keep-tex: false
 editor: visual
-output-file: "rec_boletim_SE05"
-output-ext: "pdf"
 ---
 
 ```{r setup, include=FALSE}
@@ -73,11 +107,11 @@ limiar_epidemico <- params$limiar_epidemico
 limiar_posseason <- params$limiar_posseason
 
 # Dados históricos de alerta (API InfoDengue)
-dados_api_dengue <- read.csv("~/Documents/dados_teste_intramunicipal/se05/dengue_52-5.csv") %>% 
+dados_api_dengue <- read.csv("~/Documents/dados_teste_intramunicipal/recife/se05/dengue_52-5.csv") %>% 
   mutate(arbo = "dengue") %>% 
   arrange(SE)
 
-dados_api_chikon <- read.csv("~/Documents/dados_teste_intramunicipal/se05/chikungunya_52-5.csv") %>% 
+dados_api_chikon <- read.csv("~/Documents/dados_teste_intramunicipal/recife/se05/chikungunya_52-5.csv") %>% 
   mutate(arbo = "chikon") %>% 
   arrange(SE)
 
@@ -85,7 +119,7 @@ dados_api <- rbind(dados_api_dengue, dados_api_chikon) #%>%
  # filter(SE > 202301)
 
 # Dados de notificacoes
-df_mun <- read_parquet("~/Documents/dados_teste_intramunicipal/se05/dengue.parquet") %>% 
+df_mun <- read_parquet("~/Documents/dados_teste_intramunicipal/recife/se05/dengue.parquet") %>% 
   filter(municipio_geocodigo == 2611606) %>% 
   mutate(
     sem_not = paste0(ano_notif, sprintf("%02d", se_notif)),
@@ -113,6 +147,14 @@ breaks_1ano <- criar_breaks_1ano(ano_fim = ano_atual,
                                                 semana_fim = week_atual)
 
 breaks_anual <- sprintf("%02d", seq(1,52, by = 4))
+
+writeLines(
+  con = "cabecalho_municipio.tex",
+  text = c(
+    paste0("\\newcommand{\\theweek}{",      week_atual, "}"),
+    paste0("\\newcommand{\\theyear}{",      ano_atual,  "}")
+  )
+)
 
 # Dados de temperatura downscaling por rpa_nome
 # rpa_nome_downsc <- read.csv("./downscaling infodengue/output/medias_por_rpa_nome.csv") %>% 
@@ -191,7 +233,7 @@ nowcastdg_rpa <- df_mun_ok %>%
   select(dt_digita, dt_sin_pri, dt_notific, rpa_nome)
 ```
 
-```{r calcular_alertas, include=FALSE, cache=TRUE}
+```{r calcular_alertas, include=FALSE, cache=FALSE}
 
 # municipio
 
@@ -289,7 +331,7 @@ if (any(df_bairros$arbo == "chikon", na.rm = TRUE)) {
 }
 ```
 
-```{r nowcasting, include=FALSE, cache=TRUE}
+```{r nowcasting, include=FALSE, cache=FALSE}
 # Nowcasting Municipal
 mun_nowscasting <- nowcasting_inla(
   dataset = nowcastdg_mun,
@@ -1450,11 +1492,20 @@ casos_acumulado_atual <- dados_api %>%
 inc_acumulado <- round(casos_acumulado_atual/616317*1e5, 1)
 ```
 
-# Boletim Semanal Municipal
+```{r cabeçalho_antigo}
+#| eval: false
+#| include: false
 
-# Semana `r week_atual` de `r ano_atual`
+Boletim Semanal Municipal
 
-# Recife - PE
+Semana r week_atual de r ano_atual
+
+Recife - PE
+
+
+```
+
+# Situação das arboviroses em Recife - PE
 
 ## Contextualização do município e processamento
 

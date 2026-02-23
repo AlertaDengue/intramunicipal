@@ -1,30 +1,64 @@
 ---
 title: ""
-format: 
+format:
   pdf:
     fig-width: 4
     include-in-header:
-      text: |
-        \usepackage{fancyhdr}
-        \usepackage{graphicx}
-        \usepackage[export]{adjustbox}
-        \setlength{\headheight}{36pt}
-        \addtolength{\topmargin}{-20pt}
-        \pagestyle{fancy}
-        \fancyhf{}
-        \fancyhead[L]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}} #ajustar!!
-        \fancyhead[R]{\includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}} #ajustar!!
-        \renewcommand{\headrulewidth}{0pt}
-        \fancypagestyle{plain}{
+      - text: |
+          \usepackage{fancyhdr}
+          \usepackage{graphicx}
+          \usepackage[export]{adjustbox}
+          \usepackage{xcolor}
+          \usepackage{hyperref}
+          \definecolor{infodengue}{RGB}{0, 83, 156}
+          \setlength{\headheight}{70pt}
+          \addtolength{\topmargin}{-40pt}
+          \input{cabecalho_municipio.tex}
+          \pagestyle{fancy}
           \fancyhf{}
-          \fancyhead[L]{\includegraphics[height=25pt]{logo1.png}}
-          \fancyhead[R]{\includegraphics[height=25pt]{logo2.png}}
+          \fancyhead[L]{%
+            \begin{minipage}{\textwidth}
+              \includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}%
+              \hfill%
+              \includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}\\[-6pt]
+              \color{infodengue}\rule{\textwidth}{2pt}\\[2pt]
+              \color{black}\small\textbf{Boletim Semanal - semana \theweek\ de \theyear}\\[1pt]
+            \end{minipage}
+          }
           \renewcommand{\headrulewidth}{0pt}
-        }
+          \fancyfoot[L]{%
+            \begin{minipage}{\textwidth}
+              \color{infodengue}\rule{\textwidth}{1pt}\\[2pt]
+              \color{black}\small%
+              \href{https://info.dengue.mat.br/}{InfoDengue}%
+              \hfill Boletim Municipal - Joinville \hfill SE \theweek\ de \theyear
+            \end{minipage}
+          }
+          \renewcommand{\footrulewidth}{0pt}
+          \fancypagestyle{plain}{
+            \fancyhf{}
+            \fancyhead[L]{%
+              \begin{minipage}{\textwidth}
+                \includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}%
+                \hfill%
+                \includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}\\[-6pt]
+                \color{infodengue}\rule{\textwidth}{2pt}\\[2pt]
+                \color{black}\small\textbf{Boletim Semanal - semana \theweek\ de \theyear}\\[1pt]
+              \end{minipage}
+            }
+            \renewcommand{\headrulewidth}{0pt}
+            \fancyfoot[L]{%
+              \begin{minipage}{\textwidth}
+                \color{infodengue}\rule{\textwidth}{1pt}\\[2pt]
+                \color{black}\small%
+                \href{https://info.dengue.mat.br/}{InfoDengue}%
+                \hfill Boletim Municipal - \themunicipio \hfill SE \theweek\ de \theyear
+              \end{minipage}
+            }
+            \renewcommand{\footrulewidth}{0pt}
+          }
     keep-tex: false
 editor: visual
-output-file: "joi_boletim_SE49"
-output-ext: "pdf"
 ---
 
 ```{r setup, include=FALSE}
@@ -77,12 +111,12 @@ limiar_posseason <- params$limiar_posseason
 #   arrange(SE)
 
 ## SUBSTITUIR AQUI POR DADOS da tabela_historico_alerta
-dados_api_dengue <- read.csv("~/Documents/dados_teste_intramunicipal/se05/dengue_52-5.csv") %>%
+dados_api_dengue <- read.csv("~/Documents/dados_teste_intramunicipal/joinville/se05/dengue_52-5.csv") %>%
   mutate(arbo = "dengue") %>%
   arrange(SE)
 
 ## SUBSTITUIR AQUI POR DADOS da tabela_historico_alerta
-dados_api_chikon <- read.csv("~/Documents/dados_teste_intramunicipal/se05/chikungunya_52-5.csv") %>%
+dados_api_chikon <- read.csv("~/Documents/dados_teste_intramunicipal/joinville/se05/chikungunya_52-5.csv") %>%
   mutate(arbo = "chikon") %>%
   arrange(SE)
 
@@ -90,7 +124,7 @@ dados_api <- rbind(dados_api_dengue, dados_api_chikon)
 
 ## SUBSTITUIR AQUI POR DADOS da tabela_notificação
 # Dados de notificacoes
-df_mun <- read_parquet("~/Documents/dados_teste_intramunicipal/se05/dengue.parquet") %>% 
+df_mun <- read_parquet("~/Documents/dados_teste_intramunicipal/joinville/se05/dengue.parquet") %>% 
   filter(municipio_geocodigo == 4209102) %>% 
   mutate(
     sem_not = paste0(ano_notif, sprintf("%02d", se_notif)),
@@ -119,6 +153,15 @@ breaks_1ano <- criar_breaks_1ano(ano_fim = ano_atual,
                                                 semana_fim = week_atual)
 
 breaks_anual <- sprintf("%02d", seq(1,52, by = 1))
+
+# Gera arquivo .tex com as macros do cabeçalho para esta renderização
+writeLines(
+  con = "cabecalho_municipio.tex",
+  text = c(
+    paste0("\\newcommand{\\theweek}{",      week_atual, "}"),
+    paste0("\\newcommand{\\theyear}{",      ano_atual,  "}")
+  )
+)
 
 
 # Dados de temperatura downscaling por rpa_nome
@@ -196,7 +239,7 @@ nowcastdg_distritos <- df_mun_ok %>%
   select(dt_digita, dt_sin_pri, dt_notific, distrito)
 ```
 
-```{r calcular_alertas, include=FALSE, cache=TRUE}
+```{r calcular_alertas, include=FALSE, cache=FALSE}
 
 # municipio
 
@@ -289,7 +332,7 @@ if (any(df_bairros$arbo == "chikon", na.rm = TRUE)) {
 }
 ```
 
-```{r nowcasting, include=FALSE, cache=TRUE}
+```{r nowcasting, include=FALSE, cache=FALSE}
 # Nowcasting Municipal
 mun_nowscasting <- nowcasting_inla(
   dataset = nowcastdg_mun,
@@ -1322,18 +1365,25 @@ casos_acumulado_atual <- dados_api %>%
 inc_acumulado <- round(casos_acumulado_atual/616317*1e5, 1)
 ```
 
+```{r cabeçalho_antigo}
+#| eval: false
+#| include: false
 # Boletim Semanal Municipal
-
-# Semana `r week_atual` de `r ano_atual`
-
+# 
+# Semana r week_atual de r ano_atual
+# 
 # Joinville - PE
+```
+
+# Situação das arboviroses em Joinville - SC
 
 ## Contextualização do município e processamento
 
 O município de Joinville (SC) é o mais populoso do estado (616.317 habitantes) e possui oficialmente 43 bairros em sua extensão urbana. O uso do espaço urbano de acordo com o uso do solo pode ser observado na figura 1.
 
 ```{r fig1, fig.cap="Descrição do espaço urbano do município de Recife de acordo com o uso do solo.", fig.height=7, fig.width=6, out.width="50%"}
-#| echo: false
+#| eval: false
+#| include: false
 
 fig1
 ```
@@ -1341,7 +1391,8 @@ fig1
 O presente boletim apresenta análises realizadas nos níveis municipal, de distritos e bairros. Os distritos foram agregados com base na intersecção dos bairros com os três distritos de abrangência das Unidades Básicas de Saúde (UBS): Distrito Centro, Distrito Norte e Distrito Sul (Figura 2). Não capturamos a dinâmica da região rural do município devido a inexistência de informações precisas referentes a localização das notificacoes nesta região, no entanto, os bairros Morro do Meio, Rio Bonito, Pirabeiraba, Vila Cubatão e Vila Nova frequentemente incorporam os casos que são associados à região rural.
 
 ```{r fig2, fig.cap="Demarcação do ambiente urbano de Recife, com bairros e RPAs", fig.width=6, out.width="100%"}
-#| echo: false
+#| eval: false
+#| include: false
 
 fig2
 ```

@@ -18,9 +18,9 @@ format:
           \fancyhf{}
           \fancyhead[L]{%
             \begin{minipage}{\textwidth}
-              \includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}%
+              \includegraphics[height=40pt]{~/Documentos/intramunicipal/logo1.png}%
               \hfill%
-              \includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}\\[-6pt]
+              \includegraphics[height=40pt]{~/Documentos/intramunicipal/logo2.png}\\[-6pt]
               \color{infodengue}\rule{\textwidth}{2pt}\\[2pt]
               \color{black}\small\textbf{Boletim Semanal - semana \theweek\ de \theyear}\\[1pt]
             \end{minipage}
@@ -39,9 +39,9 @@ format:
             \fancyhf{}
             \fancyhead[L]{%
               \begin{minipage}{\textwidth}
-                \includegraphics[height=40pt]{~/Documents/intramunicipal/logo1.png}%
+                \includegraphics[height=40pt]{~/Documentos/intramunicipal/logo1.png}%
                 \hfill%
-                \includegraphics[height=40pt]{~/Documents/intramunicipal/logo2.png}\\[-6pt]
+                \includegraphics[height=40pt]{~/Documentos/intramunicipal/logo2.png}\\[-6pt]
                 \color{infodengue}\rule{\textwidth}{2pt}\\[2pt]
                 \color{black}\small\textbf{Boletim Semanal - semana \theweek\ de \theyear}\\[1pt]
               \end{minipage}
@@ -85,7 +85,7 @@ pacman::p_load(
 )
 
 # Carregar funções customizadas
-source("~/Documents/intramunicipal/funcoes_submunicipal.R")
+source("~/Documentos/intramunicipal/funcoes_submunicipal.R")
 
 # Definir ano e semana atual
 ano_atual <- year(Sys.Date()) #- 1
@@ -94,7 +94,7 @@ ano_atual <- year(Sys.Date()) #- 1
 
 ```{r carregar_dados, include=FALSE, cache=FALSE}
 # Carregar dados de referência
-load("~/Documents/intramunicipal/joinville/ref2_JV.RData")
+load("~/Documentos/intramunicipal/joinville/ref2_JV.RData")
 
 # Limiares MEM para Recife
 limiar_preseason <- params$limiar_preseason
@@ -111,12 +111,12 @@ limiar_posseason <- params$limiar_posseason
 #   arrange(SE)
 
 ## SUBSTITUIR AQUI POR DADOS da tabela_historico_alerta
-dados_api_dengue <- read.csv("~/Documents/dados_teste_intramunicipal/joinville/se05/dengue_52-5.csv") %>%
+dados_api_dengue <- read.csv("~/Documentos/dados_teste_intramunicipal/joinville/se05/dengue_52-5.csv") %>%
   mutate(arbo = "dengue") %>%
   arrange(SE)
 
 ## SUBSTITUIR AQUI POR DADOS da tabela_historico_alerta
-dados_api_chikon <- read.csv("~/Documents/dados_teste_intramunicipal/joinville/se05/chikungunya_52-5.csv") %>%
+dados_api_chikon <- read.csv("~/Documentos/dados_teste_intramunicipal/joinville/se05/chikungunya_52-5.csv") %>%
   mutate(arbo = "chikon") %>%
   arrange(SE)
 
@@ -124,7 +124,7 @@ dados_api <- rbind(dados_api_dengue, dados_api_chikon)
 
 ## SUBSTITUIR AQUI POR DADOS da tabela_notificação
 # Dados de notificacoes
-df_mun <- read_parquet("~/Documents/dados_teste_intramunicipal/joinville/se05/dengue.parquet") %>% 
+df_mun <- read_parquet("~/Documentos/dados_teste_intramunicipal/joinville/se05/dengue.parquet") %>% 
   filter(municipio_geocodigo == 4209102) %>% 
   mutate(
     sem_not = paste0(ano_notif, sprintf("%02d", se_notif)),
@@ -1382,8 +1382,7 @@ inc_acumulado <- round(casos_acumulado_atual/616317*1e5, 1)
 O município de Joinville (SC) é o mais populoso do estado (616.317 habitantes) e possui oficialmente 43 bairros em sua extensão urbana. O uso do espaço urbano de acordo com o uso do solo pode ser observado na figura 1.
 
 ```{r fig1, fig.cap="Descrição do espaço urbano do município de Recife de acordo com o uso do solo.", fig.height=7, fig.width=6, out.width="50%"}
-#| eval: false
-#| include: false
+#| echo: false
 
 fig1
 ```
@@ -1391,8 +1390,7 @@ fig1
 O presente boletim apresenta análises realizadas nos níveis municipal, de distritos e bairros. Os distritos foram agregados com base na intersecção dos bairros com os três distritos de abrangência das Unidades Básicas de Saúde (UBS): Distrito Centro, Distrito Norte e Distrito Sul (Figura 2). Não capturamos a dinâmica da região rural do município devido a inexistência de informações precisas referentes a localização das notificacoes nesta região, no entanto, os bairros Morro do Meio, Rio Bonito, Pirabeiraba, Vila Cubatão e Vila Nova frequentemente incorporam os casos que são associados à região rural.
 
 ```{r fig2, fig.cap="Demarcação do ambiente urbano de Recife, com bairros e RPAs", fig.width=6, out.width="100%"}
-#| eval: false
-#| include: false
+#| echo: false
 
 fig2
 ```
@@ -1512,12 +1510,14 @@ A figura 9 mostra o perfil de incidência de dengue nos distritos e as cores ind
 
 ```{r fig9, fig.cap=paste0("Curva de incidência de Dengue para os RPAs Centro, Norte e Sul até SE", week_atual, ". A linha azul representa o número de casos notificados e a linha vermelha horizontal o limiar epidêmico (incidência superior a 27 casos por 100 mil habitantes)."), fig.width=12, fig.height=12, out.width="100%", out.height="110%"}
 
-plot_grid(
-  rf_inc_distrito_nomes_dengon[[1]], #+ ylim(0,500),
-  rf_inc_distrito_nomes_dengon[[2]], #+ ylim(0,500),
-  rf_inc_distrito_nomes_dengon[[3]], #+ ylim(0,500),
-  ncol = 1
-)
+# plot_grid(
+#   rf_inc_distrito_nomes_dengon[[1]], #+ ylim(0,500),
+#   rf_inc_distrito_nomes_dengon[[2]], #+ ylim(0,500),
+#   rf_inc_distrito_nomes_dengon[[3]], #+ ylim(0,500),
+#   ncol = 1
+# )
+
+plot_grid(plotlist = rf_inc_distrito_nomes_dengon, ncol = 2)
 ```
 
 \vspace{1cm}
@@ -1542,12 +1542,14 @@ A figura 11 mostra o perfil de incidência de chikungunya nos Distritos de Saúd
 
 ```{r fig11, fig.cap=paste0("Curva de incidência de chikungunya para os RPAs Centro, Norte e Sul até SE", week_atual, ". A linha azul representa o número de casos notificados e a linha vermelha horizontal o limiar epidêmico (incidência superior a 27 casos por 100 mil habitantes)."), fig.width=12, fig.height=12, out.width="100%", out.height="110%"}
 
-plot_grid(
-  rf_inc_distrito_nomes_chikon[[1]], #+ ylim(0,500),
-  rf_inc_distrito_nomes_chikon[[2]], #+ ylim(0,500),
-  rf_inc_distrito_nomes_chikon[[3]], #+ ylim(0,500),
-  ncol = 1
-)
+# plot_grid(
+#   rf_inc_distrito_nomes_chikon[[1]], #+ ylim(0,500),
+#   rf_inc_distrito_nomes_chikon[[2]], #+ ylim(0,500),
+#   rf_inc_distrito_nomes_chikon[[3]], #+ ylim(0,500),
+#   ncol = 1
+# )
+
+plot_grid(plotlist = rf_inc_distrito_nomes_chikon, ncol = 2)
 
 ```
 

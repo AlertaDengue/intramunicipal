@@ -1,9 +1,11 @@
-## pacotes
+##### NOWCASTING ESPAÇO-TEMPORAL
+
+#========== pacotes
 
 pacman::p_load(sf,sp,spdep,INLA,
                tidyverse,lubridate)
 
-## espacial
+#========== espacial
 
 rf_rpa <- rf_rpa_shape %>%
   group_by(rpa_nome) %>%
@@ -15,11 +17,10 @@ rf_rpa_sp <- as(rf_rpa, "Spatial")
 graph.file <- "RPA.graph"
 nb2INLA(graph.file, poly2nb(rf_rpa_sp))
 
-# 4. Visualizar a conectividade entre RPAs
 plot(rf_rpa_sp, border = "gray")
 plot(poly2nb(rf_rpa_sp), coordinates(rf_rpa_sp), col = "red", lwd = 2, add = TRUE)
 
-## preparando dados
+#========== preparando dados
 
 dados_individuais <- nowcastdg_rpa %>%
   select(
@@ -30,7 +31,6 @@ dados_individuais <- nowcastdg_rpa %>%
   # Filtrar dados válidos
   filter(!is.na(data_evento), !is.na(data_registro))
 
-# Se QUISER agregar por semana (igual ao exemplo)
 dados_semanais <- dados_individuais %>%
   mutate(
     # Criar semana epidemiológica (começando domingo)
@@ -48,14 +48,11 @@ dados_semanais <- dados_individuais %>%
   # Completar combinações faltantes
   complete(rpa_nome, semana_evento, delay = 0:26, fill = list(Y = 0))
 
-# Agora sim, seguir a mesma lógica do exemplo:
-Today <- max(dados_semanais$semana_evento)  # 2 semanas de margem
+Today <- max(dados_semanais$semana_evento)  
 
-# Filtrar até Today
 dados_obs <- dados_semanais %>%
   filter(semana_evento <= Today)
 
-# O mesmo loop para criar NAs (em semanas)
 Dmax <- 10
 for(d in Dmax:1) {
   dados_obs$Y[
@@ -66,7 +63,6 @@ for(d in Dmax:1) {
 
 dados_obs %>% filter( is.na(Y) == T) %>% group_by(delay) %>% summarise(sum(is.na(Y)))
 
-# Criar variável Time (semanas desde o início)
 FirstDate <- min(dados_obs$semana_evento)
 dados_obs <- dados_obs %>%
   mutate(
@@ -103,29 +99,21 @@ p0 <- ggplot(comparacao, aes(x = semana_evento)) +
 
 print(p0)
 
-## modelo
 
 
-## preparar espacial
-
-# Criar mapeamento rpa_nome -> código numérico (1:n)
-# IMPORTANTE: usar a mesma ordem do shapefile para consistência
 rpa_ordem <- data.frame(
   rpa_nome = as.character(rf_rpa_sp@data$rpa_nome),
   GEOCOD = 1:nrow(rf_rpa_sp@data)  # ordem NATIVA do shapefile
 )
 
-# Juntar com dados_obs (garantir que nomes coincidem)
 dados_obs <- dados_obs %>%
   mutate(rpa_nome = as.character(rpa_nome)) %>%
   left_join(rpa_ordem %>% select(rpa_nome, GEOCOD), by = "rpa_nome")
 
-# Verificar se algum rpa_nome ficou sem GEOCOD
 if(any(is.na(dados_obs$GEOCOD))) {
   stop("Existem rpa_nome em dados_obs que não estão no shapefile!")
 }
 
-# Criar índices para efeitos interativos
 dados_obs <- dados_obs %>%
   mutate(
     # Delay.Region: interação delay x região (para efeitos iid)
@@ -139,13 +127,10 @@ dados_obs <- dados_obs %>%
     idx = 1:n()
   )
 
-# Identificar índices com missing (para predição)
 index.missing <- which(is.na(dados_obs$Y))
 
-# Verificar estrutura
-glimpse(dados_obs)
+#========== criação do grafo
 
-# criação do grafo
 
 # O graph.file que você criou
 graph.file <- "RPA.graph"
@@ -157,9 +142,7 @@ print(paste("Número de vizinhos:", sum(graph_info$nnbs)))
 print("Matriz de adjacência (primeiras linhas):")
 print(graph_info$graph[1:min(5, graph_info$n), 1:min(5, graph_info$n)])
 
-####################################################
-# 3. DEFINIR PRIORS (leo)
-####################################################
+#========== priors (Leo)
 
 half_normal_sd <- function(sigma) {
   return(
@@ -172,14 +155,12 @@ half_normal_sd <- function(sigma) {
   )
 }
 
-####################################################
-# 4. DEFINIR MODELOS COM ESTRUTURA ESPACIAL
-####################################################
+#========== modelos
 
 # Número máximo de delays
 Dmax <- max(dados_obs$delay, na.rm = TRUE)
 
-### Modelo 1: Efeitos principais + iid espacial + interação delay-região
+## Modelo 1: Efeitos principais + iid espacial + interação delay-região
 modelo1 <- Y ~ 1 + 
   # Efeito temporal (RW1)
   f(Time, model = "rw1", constr = TRUE,
@@ -198,7 +179,7 @@ modelo1 <- Y ~ 1 +
     hyper = list(prec = list(prior = half_normal_sd(0.1)))
   )
 
-### Modelo 2: Adicionar interação tempo-delay
+## Modelo 2: Adicionar interação tempo-delay
 modelo2 <- Y ~ 1 + 
   f(Time, model = "rw1", constr = TRUE,
     hyper = list(prec = list(prior = half_normal_sd(0.1)))
@@ -218,7 +199,7 @@ modelo2 <- Y ~ 1 +
     hyper = list(prec = list(prior = half_normal_sd(0.1)))
   )
 
-### Modelo 3: Modelo completo com BYM espacial (mais sofisticado)
+## Modelo 3: Modelo completo com BYM espacial (mais sofisticado)
 modelo3 <- Y ~ 1 + 
   f(Time, model = "rw1", constr = TRUE,
     hyper = list(prec = list(prior = half_normal_sd(0.1)))
@@ -241,7 +222,7 @@ modelo3 <- Y ~ 1 +
     hyper = list(prec = list(prior = half_normal_sd(0.1)))
   )
 
-### Modelo 4: Modelo completo + interação tempo-região
+## Modelo 4: Modelo completo + interação tempo-região
 modelo4 <- Y ~ 1 + 
   f(Time, model = "rw1", constr = TRUE,
     hyper = list(prec = list(prior = half_normal_sd(0.1)))
@@ -267,16 +248,14 @@ modelo4 <- Y ~ 1 +
     hyper = list(prec = list(prior = half_normal_sd(0.1)))
   )
 
-## rodar modelo
+#========== rodar 
 
-# Escolher o modelo (comece com modelo3 que é o mais próximo do autor)
 modelo_escolhido <- modelo3
 
-# Rodar INLA
 output <- inla(
   formula = modelo_escolhido,
   family = "nbinomial",
-  data = as.data.frame(dados_obs),
+  data = dados_obs,
   num.threads = 1,
   control.predictor = list(link = 1, compute = TRUE),
   control.compute = list(config = TRUE, dic = TRUE, waic = TRUE, cpo = TRUE),
@@ -287,10 +266,9 @@ output <- inla(
   control.inla = list(strategy = "adaptive", int.strategy = "eb")
 )
 
-# Resumo do modelo
-summary(output)
+#========== outputs
 
-## extrair resultados
+summary(output)
 
 # Fixed effects
 print("=== FIXED EFFECTS ===")
@@ -304,7 +282,7 @@ print(output$summary.hyperpar)
 print(paste("DIC:", round(output$dic$dic, 2)))
 print(paste("WAIC:", round(output$waic$waic, 2)))
 
-## amostragem nowscating
+#========== sampling 
 
 n_samples <- 1000
 cat("Amostrando", n_samples, "da posteriori...\n")
@@ -362,7 +340,7 @@ dados_obs_agreg <- dados_obs %>%
   group_by(rpa_nome, semana_evento) %>%
   summarise(Y_obs = sum(Y), .groups = 'drop')
 
-## visu por região
+#========== Visualização da série + nowcasting 
 regioes <- unique(nowcasting_results$rpa_nome)
 
 lista_plots <- list()
@@ -421,7 +399,7 @@ for(reg in regioes) {
 
 plot_grid(plotlist = lista_plots, ncol = 2)
 
-#### efeitos
+#========== Efeitos
 
 # espacial BYM
 

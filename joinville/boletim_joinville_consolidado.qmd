@@ -152,7 +152,7 @@ ano_week <- as.numeric(paste0(ano_atual, sprintf("%02d", week_atual)))
 breaks_1ano <- criar_breaks_1ano(ano_fim = ano_atual,
                                                 semana_fim = week_atual)
 
-breaks_anual <- sprintf("%02d", seq(1,52, by = 1))
+breaks_anual <- sprintf("%02d", seq(1,52, by = 4))
 
 # Gera arquivo .tex com as macros do cabeçalho para esta renderização
 writeLines(

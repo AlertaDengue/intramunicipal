@@ -1496,11 +1496,11 @@ inc_acumulado <- round(casos_acumulado_atual/616317*1e5, 1)
 #| eval: false
 #| include: false
 
-Boletim Semanal Municipal
-
-Semana r week_atual de r ano_atual
-
-Recife - PE
+# Boletim Semanal Municipal
+# 
+# Semana r week_atual de r ano_atual
+# 
+# Recife - PE
 
 
 ```
